@@ -47,3 +47,8 @@ public class ActionService {
         return response;
     }
 }
+
+/*
+Sử dụng phương thức convertToResponse() để chuyển đổi dữ liệu entity Action sang dạng DTO ActionResponse.
+Xử lý việc phân trang (Pageable) và trả về danh sách các hành động dưới dạng ActionResponse.
+ */

@@ -55,3 +55,8 @@ public class Action {
         this.time = time;
     }
 }
+/*
+đại diện cho các bảng trong cơ sở dữ liệu mysql lien qua den du lieu cam bien va hanh dong dieu khien thiet bi
+ luu cac hanh dong dieu khien thiet bi nhu dieu khien den led
+
+* */

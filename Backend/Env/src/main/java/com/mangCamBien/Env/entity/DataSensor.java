@@ -64,4 +64,8 @@ public class DataSensor {
         this.humidity = humidity;
     }
 }
-// thuc the co bao nhieu truong
+/*
+    Chua cac truong temperature , humidity , light, time luu du lieu do tu cam bien
+    su dung LocalDatetime de luu thoi gian cua du lieu cam bien
+
+* */

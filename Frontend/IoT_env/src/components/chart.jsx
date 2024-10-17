@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { LineChart } from '@mui/x-charts/LineChart';
+import { BarChart } from '@mui/x-charts/BarChart';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
@@ -20,7 +20,6 @@ export default function BasicCharts() {
         const { content } = response.data;
 
         if (content && content.length > 0) {
-          // Ensure that temperature, humidity, light are properly parsed as floats, or default to 0
           const temperatures = content.map(data => {
             const temp = parseFloat(data.temperature);
             return isNaN(temp) ? 0 : temp;
@@ -36,13 +35,18 @@ export default function BasicCharts() {
             return isNaN(light) ? 0 : light;
           });
 
-          // Ensure time is valid and in the correct format
           const times = content.map(data => {
             const date = new Date(data.time);
             return !isNaN(date.getTime()) ? date.toLocaleTimeString() : 'Invalid time';
           });
 
-          setChartData({ temperatures, humidities, lights, times });
+          // Giới hạn số lượng điểm xuống 5
+          setChartData({
+            temperatures: temperatures.slice(-5),
+            humidities: humidities.slice(-5),
+            lights: lights.slice(-5),
+            times: times.slice(-5)
+          });
         } else {
           console.warn('No data received or content is empty');
         }
@@ -54,7 +58,6 @@ export default function BasicCharts() {
     fetchData();
   }, []);
 
-  // Validate if data arrays have the same length and are non-empty
   const hasValidData = chartData.temperatures.length > 0 &&
     chartData.humidities.length > 0 &&
     chartData.lights.length > 0 &&
@@ -71,7 +74,7 @@ export default function BasicCharts() {
         </Typography>
         <div style={{ height: '400px' }}>
           {hasValidData ? (
-            <LineChart
+            <BarChart
               series={[
                 {
                   label: 'Temperature (°C)',
@@ -89,8 +92,9 @@ export default function BasicCharts() {
                   color: '#ffeb3b'
                 }
               ]}
-              width={800}
               height={400}
+              xAxis={[{ data: chartData.times, scaleType: 'band' }]}
+              margin={{ top: 10, bottom: 30, left: 40, right: 10 }}
             />
           ) : (
             <Typography variant="body1" color="textSecondary">

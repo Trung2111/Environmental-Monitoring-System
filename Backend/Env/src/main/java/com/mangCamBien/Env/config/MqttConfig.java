@@ -40,7 +40,7 @@ public class MqttConfig {
 
 
     private String password = "admin";
-
+// thiết lập kết nối đến broker MQTT
     @Bean
     public MqttPahoClientFactory mqttClientFactory() {
         DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
@@ -59,7 +59,7 @@ public class MqttConfig {
         return new DirectChannel();
     }
 
-    // Inbound adapter for 'data_sensor' topic
+    // Inbound adapter for 'data_sensor' topic nhận dữ liệu cảm biến từ topic 'datasensor'
     @Bean
     public MessageProducer inboundDataSensor() {
         MqttPahoMessageDrivenChannelAdapter adapter =
@@ -72,7 +72,7 @@ public class MqttConfig {
         return adapter;
     }
 
-    // Inbound adapter for 'action' topic
+    // Inbound adapter for 'action' topic nhan du lieu dieu khien thiet bi qua topic 'action'
     @Bean
     public MessageProducer inboundAction() {
         MqttPahoMessageDrivenChannelAdapter adapter =
@@ -85,6 +85,11 @@ public class MqttConfig {
         return adapter;
     }
 
+    /*
+    Dữ liệu nhận từ topic data_sensor (nhiệt độ, độ ẩm, ánh sáng) được phân tích và xử lý tại phương thức
+    handler(). JSON được phân tích và xác nhận xem các trường dữ liệu có đầy đủ không (nhiệt độ, độ ẩm, ánh sáng).
+    Nếu hợp lệ, dữ liệu sẽ được lưu vào cơ sở dữ liệu MySQL thông qua lớp DataSensorRepository.
+     */
     @Bean
     @ServiceActivator(inputChannel = "mqttInputChannel")
     public MessageHandler handler() {
@@ -103,7 +108,7 @@ public class MqttConfig {
                             jsonNode.get("temperature").asText(),
                             jsonNode.get("humidity").asText(),
                             jsonNode.get("light").asText());
-
+                    // luu vao mysql
                     saveDataSensor(jsonNode);
                 } else {
                     log.warn("Missing required fields in JSON: {}", jsonNode);

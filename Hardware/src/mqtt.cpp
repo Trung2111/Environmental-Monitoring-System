@@ -8,7 +8,7 @@ PubSubClient client(espClient);
 const char* ssid =          "nmt";
 const char* password =      "123456789";
 // Mqtt Connection
-const char *mqtt_broker=    "192.168.137.1";
+const char *mqtt_broker=    "192.168.1.10";
 const char *topic_pub =     "data_sensor";
 const char *topic_sub =     "action";
 const char *mqtt_username = "admin";
@@ -22,10 +22,10 @@ static void Mqtt_Callback(char *topic, byte *payload, unsigned int length);
 static void Message_Receive(String _message);
 
 void Mqtt_Init() {
-    // Wifi Connecting
-    // Init led 25
-    pinMode(25, OUTPUT);
-    digitalWrite(25, LOW);
+  // Wifi Connecting
+  // Init led 25
+  pinMode(25, OUTPUT);
+  digitalWrite(25, LOW);
 
   pinMode(18, OUTPUT);
   digitalWrite(18, LOW);
@@ -95,7 +95,7 @@ void MqttSend()
 
 void Mqtt_Publish(const char *topic)
 {
-    String message = Mqtt_CreateMessage(DHT11_ReadTemperature(), DHT11_ReadHumidity(), BH1750FVI_ReadLux());
+    String message = Mqtt_CreateMessage(DHT11_ReadTemperature() - 3, DHT11_ReadHumidity(), BH1750FVI_ReadLux());
     const char *payload = (const char *)message.c_str();
     client.publish(topic, payload);
     //delay(5000);

@@ -5,7 +5,7 @@ import axios from 'axios';
 export default function ActionHistory() {
   const [history, setHistory] = useState([]); // Dữ liệu lịch sử
   const [page, setPage] = useState(0); // Trang hiện tại
-  const [rowsPerPage, setRowsPerPage] = useState(10); // Số hàng trên mỗi trang
+  const rowsPerPage = 10; // Cố định số hàng trên mỗi trang là 10
   const [totalElements, setTotalElements] = useState(0); // Tổng số phần tử
 
   useEffect(() => {
@@ -25,15 +25,10 @@ export default function ActionHistory() {
       }
     };
     fetchHistory();
-  }, [page, rowsPerPage]); // Fetch lại dữ liệu khi trang hoặc số hàng trên mỗi trang thay đổi
+  }, [page]); // Fetch lại dữ liệu khi trang thay đổi (không cần rowsPerPage vì đã cố định)
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); // Reset về trang 0 khi thay đổi số hàng trên mỗi trang
   };
 
   return (
@@ -67,13 +62,13 @@ export default function ActionHistory() {
         </TableContainer>
 
         <TablePagination
-          rowsPerPageOptions={[10, 25, 50]}
+          rowsPerPageOptions={[]} // Xóa tùy chọn thay đổi số hàng
           component="div"
           count={totalElements}
-          rowsPerPage={rowsPerPage}
+          rowsPerPage={rowsPerPage} // Cố định số hàng trên mỗi trang là 10
           page={page}
           onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+          onRowsPerPageChange={null} // Bỏ xử lý sự kiện thay đổi số hàng
         />
       </Paper>
     </Box>

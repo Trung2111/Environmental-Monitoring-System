@@ -42,3 +42,9 @@ public class MqttService {
         actionRepository.save(deviceAction);
     }
 }
+/*
+    Dịch vụ này chịu trách nhiệm xuất bản thông tin ra MQTT topic và lưu hành động của thiết bị vào cơ sở dữ liệu.
+    Phương thức publish() nhận thông tin về topic, payload, device, và action, sau đó:
+        Gửi thông tin tới MQTT.
+        Lưu thông tin hành động của thiết bị vào cơ sở dữ liệu.
+ */

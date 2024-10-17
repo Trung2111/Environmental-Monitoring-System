@@ -52,5 +52,7 @@ public class DataSensorService {
     }
 }
 
-
-// xu ly logic
+/*
+    Tương tự như ActionService, dịch vụ này xử lý việc phân trang và trả về danh sách các bản ghi cảm biến.
+    Có phương thức getLatestRecord() để gọi repository và lấy bản ghi cảm biến mới nhất.
+ */

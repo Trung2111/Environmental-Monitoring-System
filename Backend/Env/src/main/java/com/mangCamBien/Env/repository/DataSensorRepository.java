@@ -11,3 +11,7 @@ public interface DataSensorRepository extends JpaRepository<DataSensor,Long> {
     @Query("SELECT d FROM DataSensor d WHERE d.time = (SELECT MAX(ds.time) FROM DataSensor ds)")
     DataSensor findLatestRecord();
 }
+/*
+su dung JapRepository<DataSensor, long> de thuc hien cac thao tac CRUD voi bang data_sensor
+doan query trong repository la findLatestRecord() dung de lay ban ghi moi dua tren thoi gian
+ */

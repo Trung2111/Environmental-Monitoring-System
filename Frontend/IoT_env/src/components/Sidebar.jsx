@@ -8,41 +8,47 @@ import HistoryIcon from '@mui/icons-material/History';
 
 export default function Sidebar() {
     return (
-      <Drawer
-        variant="permanent"
-        sx={{
-          '& .MuiDrawer-paper': {
-            backgroundColor: '#37474f  ', // Thay đổi màu nền của Sidebar
-            color: '#e1f5fe', // Thay đổi màu chữ
-          },
-        }}
-      >
-        <List>
-          <ListItem button component={Link} to="/">
-            <ListItemIcon>
-              <SpaceDashboardIcon style={{ color: '#e1f5fe' }} /> {/* Màu biểu tượng */}
-            </ListItemIcon>
-            <ListItemText primary="Dashboard" />
-          </ListItem>
-          <ListItem button component={Link} to="/data-sensor">
-            <ListItemIcon>
-              <SensorsIcon style={{ color: '#e1f5fe' }} />
-            </ListItemIcon>
-            <ListItemText primary="Data Sensor" />
-          </ListItem>
-          <ListItem button component={Link} to="/action-history">
-            <ListItemIcon>
-              <HistoryIcon style={{ color: '#e1f5fe' }} />
-            </ListItemIcon>
-            <ListItemText primary="Action History" />
-          </ListItem>
-          <ListItem button component={Link} to="/profile">
-            <ListItemIcon>
-              <AccountCircleIcon style={{ color: '#e1f5fe' }} />
-            </ListItemIcon>
-            <ListItemText primary="Profile" />
-          </ListItem>
-        </List>
-      </Drawer>
+        <Drawer
+            variant="permanent"
+            sx={{
+                '& .MuiDrawer-paper': {
+                    backgroundColor: '#37474f', // Thay đổi màu nền của Sidebar
+                    color: '#e1f5fe', // Thay đổi màu chữ
+                },
+            }}
+        >
+            <List>
+                <ListItem button component={Link} to="/">
+                    <ListItemIcon>
+                        <SpaceDashboardIcon style={{ color: '#e1f5fe' }} /> {/* Màu biểu tượng */}
+                    </ListItemIcon>
+                    <ListItemText primary="Dashboard" />
+                </ListItem>
+                <ListItem button component={Link} to="/dashboard-co2"> {/* Thêm DashboardCo2 */}
+                    <ListItemIcon>
+                      <SpaceDashboardIcon style={{ color: '#e1f5fe' }} /> {/* Màu biểu tượng */}
+                    </ListItemIcon>
+                    <ListItemText primary="Dashboard CO2" />
+                </ListItem>
+                <ListItem button component={Link} to="/data-sensor">
+                    <ListItemIcon>
+                        <SensorsIcon style={{ color: '#e1f5fe' }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Data Sensor" />
+                </ListItem>
+                <ListItem button component={Link} to="/action-history">
+                    <ListItemIcon>
+                        <HistoryIcon style={{ color: '#e1f5fe' }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Action History" />
+                </ListItem>
+                <ListItem button component={Link} to="/profile">
+                    <ListItemIcon>
+                        <AccountCircleIcon style={{ color: '#e1f5fe' }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Profile" />
+                </ListItem>
+            </List>
+        </Drawer>
     );
 }

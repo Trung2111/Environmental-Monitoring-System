@@ -1,31 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination } from '@mui/material';
+import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TextField, Button } from '@mui/material';
 import axios from 'axios';
 
 export default function ActionHistory() {
-  const [history, setHistory] = useState([]); // Dữ liệu lịch sử
-  const [page, setPage] = useState(0); // Trang hiện tại
-  const rowsPerPage = 10; // Cố định số hàng trên mỗi trang là 10
-  const [totalElements, setTotalElements] = useState(0); // Tổng số phần tử
+  const [history, setHistory] = useState([]);
+  const [page, setPage] = useState(0);
+  const rowsPerPage = 10;
+  const [totalElements, setTotalElements] = useState(0);
+
+  const [searchTerm, setSearchTerm] = useState(''); // Từ khóa tìm kiếm
+  const [startDate, setStartDate] = useState(''); // Ngày bắt đầu
+  const [endDate, setEndDate] = useState(''); // Ngày kết thúc
+
+  const fetchHistory = async (pageNo = 0) => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/v1/actions', {
+        params: {
+          pageNo,
+          pageSize: rowsPerPage,
+          search: searchTerm, // Gửi từ khóa tìm kiếm
+          startDate: startDate || null, // Gửi ngày bắt đầu nếu có
+          endDate: endDate || null // Gửi ngày kết thúc nếu có
+        },
+      });
+      setHistory(response.data.content);
+      setTotalElements(response.data.totalElement);
+    } catch (error) {
+      console.error('Error fetching history:', error);
+    }
+  };
 
   useEffect(() => {
-    // Hàm để lấy lịch sử từ API dựa vào phân trang
-    const fetchHistory = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/api/v1/actions', {
-          params: {
-            pageNo: page,
-            pageSize: rowsPerPage,
-          },
-        });
-        setHistory(response.data.content); // Cập nhật lịch sử từ API
-        setTotalElements(response.data.totalElement); // Cập nhật tổng số phần tử
-      } catch (error) {
-        console.error('Error fetching history:', error);
-      }
-    };
-    fetchHistory();
-  }, [page]); // Fetch lại dữ liệu khi trang thay đổi (không cần rowsPerPage vì đã cố định)
+    fetchHistory(page);
+  }, [page]);
+
+  const handleSearch = () => {
+    setPage(0); // Reset về trang đầu tiên khi tìm kiếm
+    fetchHistory(0);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -37,6 +49,34 @@ export default function ActionHistory() {
         <Typography variant="h4" gutterBottom>
           Action History
         </Typography>
+
+        {/* Tìm kiếm */}
+        <Box display="flex" alignItems="center" gap="10px" marginTop="20px">
+          <TextField
+            label="Search"
+            variant="outlined"
+            size="small"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <TextField
+            label="Start Date"
+            type="datetime-local"
+            size="small"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+          <TextField
+            label="End Date"
+            type="datetime-local"
+            size="small"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+          <Button variant="contained" onClick={handleSearch}>
+            Search
+          </Button>
+        </Box>
 
         <TableContainer style={{ marginTop: '20px' }}>
           <Table>
@@ -62,13 +102,12 @@ export default function ActionHistory() {
         </TableContainer>
 
         <TablePagination
-          rowsPerPageOptions={[]} // Xóa tùy chọn thay đổi số hàng
+          rowsPerPageOptions={[]}
           component="div"
           count={totalElements}
-          rowsPerPage={rowsPerPage} // Cố định số hàng trên mỗi trang là 10
+          rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
-          onRowsPerPageChange={null} // Bỏ xử lý sự kiện thay đổi số hàng
         />
       </Paper>
     </Box>

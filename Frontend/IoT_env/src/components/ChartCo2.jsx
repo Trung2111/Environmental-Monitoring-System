@@ -1,3 +1,4 @@
+// src/components/ChartCo2.jsx
 import React, { useEffect, useState } from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
 import Card from '@mui/material/Card';
@@ -5,11 +6,9 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 
-export default function BasicCharts() {
+export default function ChartCo2() {
   const [chartData, setChartData] = useState({
-    temperatures: [],
-    humidities: [],
-    lights: [],
+    co2: [],
     times: []
   });
 
@@ -20,31 +19,19 @@ export default function BasicCharts() {
         const { content } = response.data;
 
         if (content && content.length > 0) {
-          const temperatures = content.map(data => {
-            const temp = parseFloat(data.temperature);
-            return isNaN(temp) ? 0 : temp;
-          });
-
-          const humidities = content.map(data => {
-            const humidity = parseFloat(data.humidity);
-            return isNaN(humidity) ? 0 : humidity;
-          });
-
-          const lights = content.map(data => {
-            const light = parseFloat(data.light);
-            return isNaN(light) ? 0 : light;
+          const co2 = content.map(data => {
+            const co2Value = parseFloat(data.co2);
+            return isNaN(co2Value) ? 0 : co2Value;
           });
 
           const times = content.map(data => {
             const date = new Date(data.time);
             return !isNaN(date.getTime()) ? date.toLocaleTimeString() : 'Invalid time';
           });
-          
+
           // Giới hạn số lượng điểm xuống 5
           setChartData({
-            temperatures: temperatures.slice(-5),
-            humidities: humidities.slice(-5),
-            lights: lights.slice(-5),
+            co2: co2.slice(-5),
             times: times.slice(-5)
           });
         } else {
@@ -58,38 +45,22 @@ export default function BasicCharts() {
     fetchData();
   }, []);
 
-  const hasValidData = chartData.temperatures.length > 0 &&
-    chartData.humidities.length > 0 &&
-    chartData.lights.length > 0 &&
-    chartData.times.length > 0 &&
-    chartData.temperatures.length === chartData.humidities.length &&
-    chartData.humidities.length === chartData.lights.length &&
-    chartData.lights.length === chartData.times.length;
+  const hasValidData = chartData.co2.length > 0 && chartData.times.length > 0 && chartData.co2.length === chartData.times.length;
 
   return (
     <Card style={{ width: '100%', height: '90%', margin: '10px' }}>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          Biểu đồ dữ liệu cảm biến
+          Biểu đồ CO2 (ppm)
         </Typography>
         <div style={{ height: '400px' }}>
           {hasValidData ? (
             <BarChart
               series={[
                 {
-                  label: 'Temperature (°C)',
-                  data: chartData.temperatures,
-                  color: '#ff5722'
-                },
-                {
-                  label: 'Humidity (%)',
-                  data: chartData.humidities,
-                  color: '#2196f3'
-                },
-                {
-                  label: 'Light (Lux)',
-                  data: chartData.lights,
-                  color: '#ffeb3b'
+                  label: 'CO2 (ppm)',
+                  data: chartData.co2,
+                  color: '#9e9e9e'
                 }
               ]}
               height={400}

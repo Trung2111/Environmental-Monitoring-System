@@ -4,6 +4,7 @@ import DashboardPage from './pages/Dashboard'; // Đảm bảo đường dẫn c
 import Profile from './pages/Profile'; // Đảm bảo đường dẫn chính xác
 import DataSensor from './pages/DataSensor'; // Đảm bảo đường dẫn chính xác
 import ActionHistory from './pages/ActionHistory'; // Đảm bảo đường dẫn chính xác
+import DashboardCo2 from './pages/DashboardCo2'; // Đảm bảo đường dẫn chính xác
 import { Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 
@@ -17,6 +18,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/data-sensor" element={<DataSensor />} />
           <Route path="/action-history" element={<ActionHistory />} />
+          <Route path="/dashboard-co2" element={<DashboardCo2 />} /> {/* Route cho DashboardCo2 */}
         </Routes>
       </div>
     </div>

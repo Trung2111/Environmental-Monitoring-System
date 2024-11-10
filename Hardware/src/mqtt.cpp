@@ -8,28 +8,39 @@ PubSubClient client(espClient);
 const char* ssid =          "nmt";
 const char* password =      "123456789";
 // Mqtt Connection
-const char *mqtt_broker=    "192.168.1.10";
+const char *mqtt_broker=    "10.21.166.15";
 const char *topic_pub =     "data_sensor";
 const char *topic_sub =     "action";
+const char *topic_pubWarn = "warning";
 const char *mqtt_username = "admin";
 const char *mqtt_password = "admin";
 const int   mqtt_port =     1996;
 
+float co2; 
 JsonDocument doc;
 static String Mqtt_CreateMessage(float temperature, float humidity, float light);
 static void Mqtt_Publish(const char *topic);
 static void Mqtt_Callback(char *topic, byte *payload, unsigned int length);
 static void Message_Receive(String _message);
 
-void Mqtt_Init() {
+uint8_t flag_warn = 0;
+bool lightHighSent = false;
+
+void Led_Init(void)
+{
   // Wifi Connecting
-  // Init led 25
-  pinMode(25, OUTPUT);
-  digitalWrite(25, LOW);
+  // Init LEDPIN
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
 
-  pinMode(18, OUTPUT);
-  digitalWrite(18, LOW);
+  pinMode(FAN_PIN, OUTPUT);
+  digitalWrite(FAN_PIN, LOW);
 
+  pinMode(WARNING_PIN, OUTPUT);
+  digitalWrite(WARNING_PIN, LOW); 
+}
+
+void Mqtt_Init() {
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
@@ -93,7 +104,7 @@ void MqttSend()
   Mqtt_Publish(topic_pub);
 }
 
-void Mqtt_Publish(const char *topic)
+static void Mqtt_Publish(const char *topic)
 {
     String message = Mqtt_CreateMessage(DHT11_ReadTemperature() - 3, DHT11_ReadHumidity(), BH1750FVI_ReadLux());
     const char *payload = (const char *)message.c_str();
@@ -101,68 +112,37 @@ void Mqtt_Publish(const char *topic)
     //delay(5000);
 }
 
-String Mqtt_CreateMessage(float temperature, float humidity, float light)
+static String Mqtt_CreateMessage(float temperature, float humidity, float light)
 {
     if (isnan(temperature) || isnan(humidity) || isnan(light)) 
     {
       Serial.println("Failed to read from DHT sensor!");
       return "failed";
     }
+    co2 = random(0, 100);
     String message = "";
     doc.clear();
     deserializeJson(doc, message);
     doc["temperature"] = serialized(String(temperature, 2));
     doc["humidity"] =  serialized(String(humidity, 2));
     doc["light"] = serialized(String(light, 2));
+    doc["co2"] = serialized(String(co2));
     serializeJson(doc, message);
     Serial.println(message);
     return message;
 }
 
-void Mqtt_Callback(char *topic, byte *payload, unsigned int length)
+static void Mqtt_Callback(char *topic, byte *payload, unsigned int length)
 {
   Serial.print("Message arrived on topic: ");
   Serial.println(topic);
   // Serial.print(". Message: ");
   String message_str = (const char*) payload;
   Serial.println(message_str);
-   // Chuyển đổi payload thành C-style string (chuỗi kết thúc bằng ký tự null)
-
-
-  // char message_str[length + 1];  // Tạo một mảng char để lưu chuỗi
-  // memcpy(message_str, payload, length);
-  // message_str[length] = '\0';  // Thêm ký tự kết thúc chuỗi
-
-  // // Kiểm tra nếu topic là "action"
-  // if (strcmp(topic, "action") == 0) {
-  //   if (strcmp(message_str, "led1 on") == 0) {
-  //     digitalWrite(25, HIGH);  // Bật LED chân 25
-  //     Serial.println("LED1 turned on");
-  //   } else if (strcmp(message_str, "led1 off") == 0) {
-  //     digitalWrite(25, LOW);  // Tắt LED chân 25
-  //     Serial.println("LED1 turned off");
-  //   } else if (strcmp(message_str, "led2 on") == 0) {
-  //     digitalWrite(18, HIGH);  // Bật LED chân 18
-  //     Serial.println("LED2 turned on");
-  //   } else if (strcmp(message_str, "led2 off") == 0) {
-  //     digitalWrite(18, LOW);  // Tắt LED chân 18
-  //     Serial.println("LED2 turned off");
-  //   } else if (strcmp(message_str, "all on") == 0) {
-  //     digitalWrite(25, HIGH);  // Bật LED chân 25
-  //     digitalWrite(18, HIGH);  // Bật LED chân 18
-  //     Serial.println("LED2 turned on");
-  //   } else if (strcmp(message_str, "all off") == 0) {
-  //     digitalWrite(18, LOW);  // Tắt LED chân 18
-  //     digitalWrite(25, LOW);  // Bật LED chân 25
-  //     Serial.println("LED2 turned off");
-  //   }
-
-  // }
-
   Message_Receive(message_str);
 }
 
-void Message_Receive(String _message)
+static void Message_Receive(String _message)
 {
     uint8_t resp_type = 0;
     doc.clear();
@@ -176,16 +156,56 @@ void Message_Receive(String _message)
     String fan = doc["fan"].as<String>();
     if (strcmp(led.c_str(), "1") == 0)
     {
-        digitalWrite(25, HIGH);
+        digitalWrite(LED_PIN, HIGH);
     }
     else if(strcmp(led.c_str(), "0") == 0){
-        digitalWrite(25, LOW);
+        digitalWrite(LED_PIN, LOW);
     }
     if (strcmp(fan.c_str(), "1") == 0)
     {
-        digitalWrite(18, HIGH);
+        digitalWrite(FAN_PIN, HIGH);
     }
     else if(strcmp(fan.c_str(), "0") == 0){
-        digitalWrite(18, LOW);
+        digitalWrite(FAN_PIN, LOW);
     }
+}
+
+void Mqtt_LightWarning()
+{
+  
+  if(co2 >= 60 ) 
+  {
+    flag_warn = 1;
+  }
+  else if(co2 < 60)
+  {
+    flag_warn = 0;
+    lightHighSent = false;
+  }
+}
+
+void blinkLED(int pin, int interval) 
+{
+    static unsigned long lastMillis = 0;
+    unsigned long currentMillis = millis();
+    if (currentMillis - lastMillis >= interval) {
+        lastMillis = currentMillis;
+        digitalWrite(pin, !digitalRead(pin));  // Đảo trạng thái LED
+    }
+}
+
+void Mqtt_SendWarning(void) 
+{
+    StaticJsonDocument<200> docWarn;
+    String warningMessage;
+    // Tạo đối tượng JSON
+    docWarn["warning"] = "high";
+
+    // Chuyển đổi đối tượng JSON thành chuỗi
+    serializeJson(docWarn, warningMessage);
+
+    // Gửi chuỗi JSON qua MQTT
+    client.publish(topic_pubWarn, warningMessage.c_str());
+
+    lightHighSent = true;  // Cập nhật trạng thái để không gửi liên tục
 }

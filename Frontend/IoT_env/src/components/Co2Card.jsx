@@ -37,7 +37,7 @@ export default function Co2Card() {
         </Typography>
         <Typography variant="h4">{co2Data} ppm</Typography>
       </CardContent>
-      <AirIcon style={{ fontSize: 60, color: '#9e9e9e', marginRight: '10px' }} />
+      <AirIcon style={{ fontSize: 60, color: '#7CFC00', marginRight: '10px' }} />
     </Card>
   );
 }

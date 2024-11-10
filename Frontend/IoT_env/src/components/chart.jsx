@@ -42,10 +42,10 @@ export default function BasicCharts() {
           
           // Giới hạn số lượng điểm xuống 5
           setChartData({
-            temperatures: temperatures.slice(-5),
-            humidities: humidities.slice(-5),
-            lights: lights.slice(-5),
-            times: times.slice(-5)
+            temperatures: temperatures.slice(0, 5),
+            humidities: humidities.slice(0, 5),
+            lights: lights.slice(0, 5),
+            times: times.slice(0, 5)
           });
         } else {
           console.warn('No data received or content is empty');

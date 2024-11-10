@@ -5,42 +5,46 @@ import axios from 'axios';
 export default function ActionHistory() {
   const [history, setHistory] = useState([]);
   const [page, setPage] = useState(0);
-  const rowsPerPage = 10;
   const [totalElements, setTotalElements] = useState(0);
+  const rowsPerPage = 10;
 
-  const [searchTerm, setSearchTerm] = useState(''); // Từ khóa tìm kiếm
-  const [startDate, setStartDate] = useState(''); // Ngày bắt đầu
-  const [endDate, setEndDate] = useState(''); // Ngày kết thúc
+  // Trạng thái tìm kiếm
+  const [searchTerm, setSearchTerm] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
+  // Hàm lấy dữ liệu từ API
   const fetchHistory = async (pageNo = 0) => {
     try {
       const response = await axios.get('http://localhost:8080/api/v1/actions', {
         params: {
-          pageNo,
+          pageNo: pageNo,
           pageSize: rowsPerPage,
-          search: searchTerm, // Gửi từ khóa tìm kiếm
-          startDate: startDate || null, // Gửi ngày bắt đầu nếu có
-          endDate: endDate || null // Gửi ngày kết thúc nếu có
+          search: searchTerm || undefined,
+          startDate: startDate || undefined,
+          endDate: endDate || undefined
         },
       });
-      setHistory(response.data.content);
-      setTotalElements(response.data.totalElement);
+      const { content, totalElement } = response.data;
+      setHistory(content);
+      setTotalElements(totalElement);
     } catch (error) {
       console.error('Error fetching history:', error);
     }
   };
 
   useEffect(() => {
-    fetchHistory(page);
+    fetchHistory(page); // Gọi hàm fetchHistory khi trang thay đổi
   }, [page]);
 
   const handleSearch = () => {
-    setPage(0); // Reset về trang đầu tiên khi tìm kiếm
-    fetchHistory(0);
+    setPage(0); // Đặt trang về 0 khi tìm kiếm
+    fetchHistory(0); // Gọi hàm fetchHistory với trang 0
   };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
+    fetchHistory(newPage); // Lấy dữ liệu mới khi thay đổi trang
   };
 
   return (
@@ -50,8 +54,8 @@ export default function ActionHistory() {
           Action History
         </Typography>
 
-        {/* Tìm kiếm */}
-        <Box display="flex" alignItems="center" gap="10px" marginTop="20px">
+        {/* Trường tìm kiếm */}
+        <Box display="flex" gap="10px" marginBottom="20px">
           <TextField
             label="Search"
             variant="outlined"
@@ -63,6 +67,7 @@ export default function ActionHistory() {
             label="Start Date"
             type="datetime-local"
             size="small"
+            InputLabelProps={{ shrink: true }}
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
@@ -70,6 +75,7 @@ export default function ActionHistory() {
             label="End Date"
             type="datetime-local"
             size="small"
+            InputLabelProps={{ shrink: true }}
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
           />
@@ -78,7 +84,7 @@ export default function ActionHistory() {
           </Button>
         </Box>
 
-        <TableContainer style={{ marginTop: '20px' }}>
+        <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
@@ -102,12 +108,12 @@ export default function ActionHistory() {
         </TableContainer>
 
         <TablePagination
-          rowsPerPageOptions={[]}
           component="div"
           count={totalElements}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
+          rowsPerPageOptions={[]} // Tắt các tùy chọn hàng trên mỗi trang
         />
       </Paper>
     </Box>

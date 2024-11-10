@@ -1,4 +1,3 @@
-// src/components/ChartCo2.jsx
 import React, { useEffect, useState } from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
 import Card from '@mui/material/Card';
@@ -15,24 +14,27 @@ export default function ChartCo2() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/sensor/data');
+        const response = await axios.get('http://localhost:8080/sensor/data', {
+          params: {
+            pageSize: 5, // Giới hạn số lượng bản ghi trả về là 5
+            sort: 'time,desc' // Sắp xếp theo thời gian giảm dần
+          }
+        });
+        
         const { content } = response.data;
-
+  
         if (content && content.length > 0) {
-          const co2 = content.map(data => {
-            const co2Value = parseFloat(data.co2);
-            return isNaN(co2Value) ? 0 : co2Value;
-          });
-
+          // Lấy dữ liệu co2 và thời gian
+          const co2 = content.map(data => parseFloat(data.co2) || 0);
           const times = content.map(data => {
             const date = new Date(data.time);
-            return !isNaN(date.getTime()) ? date.toLocaleTimeString() : 'Invalid time';
+            return date.toLocaleTimeString();
           });
-
-          // Giới hạn số lượng điểm xuống 5
+  
+          // Cập nhật dữ liệu biểu đồ
           setChartData({
-            co2: co2.slice(-5),
-            times: times.slice(-5)
+            co2: co2.reverse(), // Đảo ngược để hiển thị theo thứ tự thời gian tăng dần
+            times: times.reverse()
           });
         } else {
           console.warn('No data received or content is empty');
@@ -41,9 +43,14 @@ export default function ChartCo2() {
         console.error('Error fetching data:', error);
       }
     };
-
-    fetchData();
+  
+    // Gọi fetchData lần đầu tiên và sau đó lặp lại mỗi 5 giây
+    fetchData(); // Lần gọi đầu tiên
+    const interval = setInterval(fetchData, 5000); // Cập nhật mỗi 5 giây
+  
+    return () => clearInterval(interval); // Xóa interval khi component unmount
   }, []);
+  
 
   const hasValidData = chartData.co2.length > 0 && chartData.times.length > 0 && chartData.co2.length === chartData.times.length;
 
@@ -60,7 +67,7 @@ export default function ChartCo2() {
                 {
                   label: 'CO2 (ppm)',
                   data: chartData.co2,
-                  color: '#9e9e9e'
+                  color: '#7CFC00'
                 }
               ]}
               height={400}

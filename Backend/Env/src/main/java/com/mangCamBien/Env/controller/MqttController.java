@@ -29,6 +29,4 @@ public class MqttController {
         mqttService.publish("action", payload, "led", ledRequest.getLed());
         return ResponseEntity.ok("LED status updated to " + ledRequest.getLed());
     }
-
-
 }

@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,12 +20,17 @@ public class DataSensorService {
     @Autowired
     private DataSensorRepository dataSensorRepository;
 
-    public PageResponse<DataSensorResponse> getAllDataSensorResponses(int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<DataSensor> dataSensors = dataSensorRepository.findAll(pageable);
+    public PageResponse<DataSensorResponse> getAllDataSensorResponses(int pageNo, int pageSize, String search, LocalDateTime startDate, LocalDateTime endDate) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+        Page<DataSensor> dataSensors;
 
-        List<DataSensor> listOfDataSensor = dataSensors.getContent();
-        List<DataSensorResponse> content = listOfDataSensor.stream()
+        if ((search != null && !search.isEmpty()) || startDate != null || endDate != null) {
+            dataSensors = dataSensorRepository.findByCondition(search, startDate, endDate, pageable);
+        } else {
+            dataSensors = dataSensorRepository.findAll(pageable);
+        }
+
+        List<DataSensorResponse> content = dataSensors.getContent().stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
 
@@ -44,11 +51,12 @@ public class DataSensorService {
         response.setTemperature(dataSensor.getTemperature());
         response.setHumidity(dataSensor.getHumidity());
         response.setLight(dataSensor.getLight());
+        response.setCo2(dataSensor.getCo2());
         response.setTime(dataSensor.getTime());
         return response;
     }
     public DataSensor getLatestRecord() {
-        return dataSensorRepository.findLatestRecord();
+        return dataSensorRepository.findTopByOrderByTimeDesc();
     }
 }
 

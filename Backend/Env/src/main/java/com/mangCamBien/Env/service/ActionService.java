@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,9 +21,9 @@ public class ActionService {
     @Autowired
     private ActionRepository actionRepository;
 
-    public PageResponse<ActionResponse> getAllActionResponses(int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<Action> actions = actionRepository.findAll(pageable);
+    public PageResponse<ActionResponse> getAllActionResponses(int pageNo, int pageSize, String search, LocalDateTime startDate, LocalDateTime endDate) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+        Page<Action> actions = actionRepository.findByCondition(search, startDate, endDate, pageable);
 
         List<ActionResponse> content = actions.getContent().stream()
                 .map(this::convertToResponse)
@@ -45,6 +47,10 @@ public class ActionService {
         response.setAction(action.getAction());
         response.setTime(action.getTime());
         return response;
+    }
+
+    public Action getLatestRecord() {
+        return actionRepository.findLatestRecord();
     }
 }
 

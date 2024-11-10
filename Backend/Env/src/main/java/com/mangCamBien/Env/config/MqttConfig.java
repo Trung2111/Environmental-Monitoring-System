@@ -2,6 +2,7 @@ package com.mangCamBien.Env.config;//package com.mangCamBien.Env.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mangCamBien.Env.entity.Action;
 import com.mangCamBien.Env.entity.DataSensor;
 import com.mangCamBien.Env.repository.ActionRepository;
 import com.mangCamBien.Env.repository.DataSensorRepository;
@@ -85,6 +86,18 @@ public class MqttConfig {
         return adapter;
     }
 
+    @Bean
+    public MessageProducer inboundWarning() {
+        MqttPahoMessageDrivenChannelAdapter adapter =
+                new MqttPahoMessageDrivenChannelAdapter("spring-mqtt-client-warning", mqttClientFactory(),
+                        "warning");  // Subscribe to "warning" topic
+        adapter.setCompletionTimeout(5000);
+        adapter.setConverter(new DefaultPahoMessageConverter());
+        adapter.setQos(1);
+        adapter.setOutputChannel(mqttInputChannel());
+        return adapter;
+    }
+
     /*
     Dữ liệu nhận từ topic data_sensor (nhiệt độ, độ ẩm, ánh sáng) được phân tích và xử lý tại phương thức
     handler(). JSON được phân tích và xác nhận xem các trường dữ liệu có đầy đủ không (nhiệt độ, độ ẩm, ánh sáng).
@@ -95,7 +108,6 @@ public class MqttConfig {
     public MessageHandler handler() {
         return message -> {
             String payload = message.getPayload().toString();
-            log.info("Received payload from MQTT: {}", payload);
 
             // Parse JSON data
             ObjectMapper objectMapper = new ObjectMapper();
@@ -103,15 +115,19 @@ public class MqttConfig {
                 JsonNode jsonNode = objectMapper.readTree(payload);
 
                 // Check if the JSON has the required fields for data_sensor
-                if (jsonNode.has("temperature") && jsonNode.has("humidity") && jsonNode.has("light")) {
-                    log.info("Valid data received: temperature = {}, humidity = {}, light = {}",
+                if (jsonNode.has("temperature") && jsonNode.has("humidity") && jsonNode.has("light") && jsonNode.has("co2")) {
+                    log.info("Valid data received: temperature = {}, humidity = {}, light = {},  co2 = {}",
                             jsonNode.get("temperature").asText(),
                             jsonNode.get("humidity").asText(),
-                            jsonNode.get("light").asText());
+                            jsonNode.get("light").asText(),
+                            jsonNode.get("co2").asText());
                     // luu vao mysql
                     saveDataSensor(jsonNode);
                 } else {
                     log.warn("Missing required fields in JSON: {}", jsonNode);
+                }
+                if (jsonNode.has("warning")) {
+                    saveAction(jsonNode);
                 }
             } catch (Exception e) {
                 log.error("Error parsing JSON: {}", e.getMessage(), e);
@@ -125,16 +141,23 @@ public class MqttConfig {
         dataSensor.setTemperature(jsonNode.get("temperature").asText());
         dataSensor.setHumidity(jsonNode.get("humidity").asText());
         dataSensor.setLight(jsonNode.get("light").asText());
+        dataSensor.setCo2(jsonNode.get("co2").asText());
         dataSensor.setTime(LocalDateTime.now());
         try {
             log.info("Saving DataSensor to MySQL: {}", dataSensor);
             dataSensorRepository.save(dataSensor);
-            log.info("DataSensor saved successfully.");
         } catch (Exception e) {
             log.error("Error saving DataSensor to MySQL: {}", e.getMessage(), e);
         }
     }
 
+    private void saveAction(JsonNode jsonNode) {
+        Action action = new Action();
+        action.setDevice("warning led");
+        action.setAction(jsonNode.get("warning").asText());
+        action.setTime(LocalDateTime.now());
+        actionRepository.save(action);
+    }
 
     @Bean
     public MqttPahoMessageHandler mqttPahoMessageHandler() {

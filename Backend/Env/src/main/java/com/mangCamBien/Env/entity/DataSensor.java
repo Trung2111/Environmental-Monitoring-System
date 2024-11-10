@@ -26,7 +26,10 @@ public class DataSensor {
     @Column(name = "light")
     private String light;
 
-
+    ///////////////////////
+    @Column(name = "co2")
+    private String co2;
+    ////////////////////////
 
     @Column(name = "time")
     private LocalDateTime time;
@@ -49,6 +52,16 @@ public class DataSensor {
         this.light = light;
     }
 
+    ///add data gas ///////////////////////////////////////
+    // Getter and Setter for gas
+    public String getCo2() {
+        return co2;
+    }
+
+    public void setCo2(String co2) {
+        this.co2 = co2;
+    }
+
     // Getter and Setter for time
     public LocalDateTime getTime() {
         return time;
@@ -69,5 +82,4 @@ public class DataSensor {
 /*
     Chua cac truong temperature , humidity , light, time luu du lieu do tu cam bien
     su dung LocalDatetime de luu thoi gian cua du lieu cam bien
-
 * */

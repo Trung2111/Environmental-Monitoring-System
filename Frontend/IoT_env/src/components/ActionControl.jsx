@@ -8,6 +8,11 @@ import AcUnitIcon from '@mui/icons-material/AcUnit'; // Icon cho quạt
 import Switch from '@mui/material/Switch';
 import axios from 'axios';
 
+import LightOnImage from '../assets/image/light on.png';
+import LightOffImage from '../assets/image/light off.png';
+import FanOnImage from '../assets/image/fan on.png';
+import FanOffImage from '../assets/image/fan off.png';
+
 export default function LEDControl() {
   const [ledState, setLedState] = useState(false);
   const [fanState, setFanState] = useState(false); // State cho quạt
@@ -41,62 +46,66 @@ export default function LEDControl() {
         <Typography variant="h6" gutterBottom>
           Điều khiển đèn LED
         </Typography>
-        <Box display="flex" flexDirection="column" alignItems="center">
-          <WbIncandescentOutlinedIcon style={{ fontSize: 90, color: ledState ? '#ffeb3b' : '#9e9e9e' }} />
-          <Box marginTop="20px" display="flex" alignItems="center">
-            <Switch
-              checked={ledState}
-              onChange={handleLedToggle}
-              color="primary"
-              inputProps={{ 'aria-label': 'controlled' }}
-              sx={{
-                '& .MuiSwitch-thumb': {
-                  width: 30,
-                  height: 30,
-                },
-                '& .MuiSwitch-track': {
-                  height: 18,
-                },
-                '& .Mui-checked': {
-                  color: '#1976d2',
-                },
-                '&.Mui-checked + .MuiSwitch-track': {
-                  backgroundColor: '#1976d2',
-                },
-              }}
-            />
-          </Box>
+        <Box display="flex" alignItems="center" justifyContent="space-between" padding="0 20px" marginBottom="40px" marginTop ="40px">
+          <Switch
+            checked={ledState}
+            onChange={handleLedToggle}
+            color="primary"
+            inputProps={{ 'aria-label': 'controlled' }}
+            sx={{
+              '& .MuiSwitch-thumb': {
+                width: 30,
+                height: 30,
+              },
+              '& .MuiSwitch-track': {
+                height: 18,
+              },
+              '& .Mui-checked': {
+                color: '#1976d2',
+              },
+              '&.Mui-checked + .MuiSwitch-track': {
+                backgroundColor: '#1976d2',
+              },
+            }}
+          />
+          <img 
+            src={ledState ? LightOnImage : LightOffImage} 
+            alt="LED" 
+            style={{ width: 90, height: 90 }} 
+          />
         </Box>
 
         {/* Điều khiển quạt */}
-        <Typography variant="h6" gutterBottom style={{ marginTop: '20px' }}>
+        <Typography variant="h6" gutterBottom>
           Điều khiển quạt
         </Typography>
-        <Box display="flex" flexDirection="column" alignItems="center">
-          <AcUnitIcon style={{ fontSize: 90, color: fanState ? '#2196f3' : '#9e9e9e' }} />
-          <Box marginTop="20px" display="flex" alignItems="center">
-            <Switch
-              checked={fanState}
-              onChange={handleFanToggle}
-              color="primary"
-              inputProps={{ 'aria-label': 'controlled' }}
-              sx={{
-                '& .MuiSwitch-thumb': {
-                  width: 30,
-                  height: 30,
-                },
-                '& .MuiSwitch-track': {
-                  height: 18,
-                },
-                '& .Mui-checked': {
-                  color: '#1976d2',
-                },
-                '&.Mui-checked + .MuiSwitch-track': {
-                  backgroundColor: '#1976d2',
-                },
-              }}
-            />
-          </Box>
+        <Box display="flex" alignItems="center" justifyContent="space-between" padding="0 20px" marginTop="40px">
+          <Switch
+            checked={fanState}
+            onChange={handleFanToggle}
+            color="primary"
+            inputProps={{ 'aria-label': 'controlled' }}
+            sx={{
+              '& .MuiSwitch-thumb': {
+                width: 30,
+                height: 30,
+              },
+              '& .MuiSwitch-track': {
+                height: 18,
+              },
+              '& .Mui-checked': {
+                color: '#1976d2',
+              },
+              '&.Mui-checked + .MuiSwitch-track': {
+                backgroundColor: '#1976d2',
+              },
+            }}
+          />
+          <img 
+            src={fanState ? FanOnImage : FanOffImage} 
+            alt="LED" 
+            style={{ width: 90, height: 90 }} 
+          />
         </Box>
       </CardContent>
     </Card>

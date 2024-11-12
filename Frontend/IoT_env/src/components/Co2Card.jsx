@@ -5,6 +5,8 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import AirIcon from '@mui/icons-material/Air'; // Icon cho CO2
 
+import Co2Image from '../assets/image/co2.png';
+
 export default function Co2Card() {
   const [co2Data, setCo2Data] = useState('Loading...');
 
@@ -37,7 +39,12 @@ export default function Co2Card() {
         </Typography>
         <Typography variant="h4">{co2Data} ppm</Typography>
       </CardContent>
-      <AirIcon style={{ fontSize: 60, color: '#7CFC00', marginRight: '10px' }} />
+      <img 
+        src={Co2Image} 
+        alt="Co2" 
+        style={{ width: 70, height: 70, marginRight: '20px' }} 
+      />
+      {/* <AirIcon style={{ fontSize: 60, color: '#7CFC00', marginRight: '10px' }} /> */}
     </Card>
   );
 }

@@ -9,6 +9,10 @@ import SensorIcon from '@mui/icons-material/DeviceThermostat';
 import HumidityIcon from '@mui/icons-material/WaterDrop';
 import LightIcon from '@mui/icons-material/WbSunny';
 
+import TemperatureImage from '../assets/image/temperature.png';
+import HumidityImage from '../assets/image/humidity.png';
+import LightImage from '../assets/image/light.png';
+
 export default function SensorData() {
   const [sensorData, setSensorData] = useState({
     temperature: 'Loading...',
@@ -56,7 +60,11 @@ export default function SensorData() {
               <Typography variant="h6">Nhiệt Độ</Typography>
               <Typography variant="h4">{sensorData.temperature}°C</Typography>
             </CardContent>
-            <SensorIcon style={{ fontSize: 60, color: '#ff5722', marginRight: '10px' }} />
+             <img 
+              src={TemperatureImage} 
+              alt="Temperature" 
+              style={{ width: 70, height: 70, marginRight: '20px' }} 
+            />
           </Card>
         </Grid>
 
@@ -75,7 +83,11 @@ export default function SensorData() {
               <Typography variant="h6">Độ Ẩm</Typography>
               <Typography variant="h4">{sensorData.humidity}%</Typography>
             </CardContent>
-            <HumidityIcon style={{ fontSize: 60, color: '#2196f3', marginRight: '10px' }} />
+            <img 
+              src={HumidityImage} 
+              alt="Humidity" 
+              style={{ width: 70, height: 70, marginRight: '20px' }} 
+            />
           </Card>
         </Grid>
 
@@ -94,7 +106,12 @@ export default function SensorData() {
               <Typography variant="h6">Ánh Sáng</Typography>
               <Typography variant="h4">{sensorData.light} Lux</Typography>
             </CardContent>
-            <LightIcon style={{ fontSize: 60, color: '#ffeb3b', marginRight: '10px' }} />
+            <img 
+              src={LightImage} 
+              alt="Light" 
+              style={{ width: 70, height: 70, marginRight: '20px' }} 
+            />
+            {/* <LightIcon style={{ fontSize: 60, color: '#ffeb3b', marginRight: '10px' }} /> */}
           </Card>
         </Grid>
       </Grid>

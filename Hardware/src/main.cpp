@@ -3,7 +3,8 @@
 #include "mqtt.h"
 
 Ticker ticker_sendData;
-Ticker ticker_checkWarn;
+Ticker ticker_checkWarn, ticker_resetFlag;
+
 
 void setup() {
   Serial.begin(115200);
@@ -15,11 +16,11 @@ void setup() {
     Mqtt_Reconnect();
   }
   ticker_sendData.attach(10.0, MqttSend);
-  ticker_checkWarn.attach_ms(50, Mqtt_LightWarning);
+  ticker_checkWarn.attach_ms(100, Mqtt_LightWarning);
 }
 
 void loop() {
-  delay(10);
+  delay(10);  
   Mqtt_Loop();
   if (flag_warn){
     blinkLED(WARNING_PIN, 500);  // Nháy LED mỗi 500ms

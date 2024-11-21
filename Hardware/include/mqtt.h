@@ -11,14 +11,14 @@
 #include "dht11.h"
 #include "bh1750fvi.h"
 
-#define LED_PIN 18
-#define FAN_PIN 26
+#define LED_PIN 17
+#define FAN_PIN 25
 #define WARNING_PIN 5
 
 const float LIGHT_THRESHOLD_HIGH = 900.0;   // Ngưỡng ánh sáng cao
 extern PubSubClient client;
-extern uint8_t flag_warn;
-extern bool lightHighSent;
+extern volatile uint8_t flag_warn;
+extern volatile bool lightHighSent;
 
 
 // Function

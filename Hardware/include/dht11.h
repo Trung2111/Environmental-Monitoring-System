@@ -5,7 +5,7 @@
 #include <DHT.h>
 
 // Define
-#define DHTPIN 14
+#define DHTPIN 32
 #define DHTTYPE DHT11 // DHT 11
 
 // Global Variables

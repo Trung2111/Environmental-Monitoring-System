@@ -8,7 +8,7 @@ PubSubClient client(espClient);
 const char* ssid =          "nmt";
 const char* password =      "123456789";
 // Mqtt Connection
-const char *mqtt_broker=    "10.21.166.15";
+const char *mqtt_broker=    "10.21.99.81";
 const char *topic_pub =     "data_sensor";
 const char *topic_sub =     "action";
 const char *topic_pubWarn = "warning";
@@ -17,14 +17,15 @@ const char *mqtt_password = "admin";
 const int   mqtt_port =     1996;
 
 float co2; 
+unsigned long warnStartTime = 0;
 JsonDocument doc;
 static String Mqtt_CreateMessage(float temperature, float humidity, float light);
 static void Mqtt_Publish(const char *topic);
 static void Mqtt_Callback(char *topic, byte *payload, unsigned int length);
 static void Message_Receive(String _message);
 
-uint8_t flag_warn = 0;
-bool lightHighSent = false;
+volatile uint8_t flag_warn = 0;
+volatile bool lightHighSent = false;
 
 void Led_Init(void)
 {
@@ -172,15 +173,28 @@ static void Message_Receive(String _message)
 
 void Mqtt_LightWarning()
 {
-  
   if(co2 >= 60 ) 
   {
-    flag_warn = 1;
+    if(flag_warn == 0)
+    {
+      flag_warn = 1;
+      warnStartTime = millis();  // Ghi lại thời điểm cờ được bật   
+    }
   }
   else if(co2 < 60)
   {
-    flag_warn = 0;
-    lightHighSent = false;
+    if(flag_warn == 1)
+    {
+      flag_warn = 0;
+      lightHighSent = false;
+      warnStartTime = 0;
+    }
+  }
+  // Kiểm tra nếu đã qua 4 giây từ khi bật cờ
+  if (flag_warn == 1 && millis() - warnStartTime >= 4000) {
+    flag_warn = 0;             // Tắt cờ
+    lightHighSent = false;     // Đặt lại trạng thái nếu cần
+    warnStartTime = 0;         // Xóa thời gian khởi tạo
   }
 }
 
